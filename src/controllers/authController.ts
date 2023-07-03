@@ -3,6 +3,7 @@ import { User } from "../models/User";
 import { AppDataSource } from "../util/database";
 import { Request, Response } from "express";
 import { genSalt, hash } from 'bcrypt';
+import { sign } from 'jsonwebtoken';
 
 type UserRequestData = {
   name: string,
@@ -34,6 +35,15 @@ const validateUserData = (req: Request): UserRequestData => {
   }
 
   return value;
+};
+
+const generateToken = (user: User): string => {
+  return sign({
+    id: user.id,
+    email: user.email,
+  }, process.env.JWT_SECRET as string, {
+    expiresIn: '1d',
+  });
 };
 
 export const registerNewUser = async (req: Request, res: Response) => {
@@ -70,7 +80,10 @@ export const registerNewUser = async (req: Request, res: Response) => {
     }
   }
 
+  const { password, ...otherDetails } = user;
+
   return res.json({
-    ...user
+    user: otherDetails,
+    token: generateToken(user),
   });
 };
