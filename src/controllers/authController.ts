@@ -2,6 +2,7 @@ import Joi from "joi";
 import { User } from "../models/User";
 import { AppDataSource } from "../util/database";
 import { Request, Response } from "express";
+import { genSalt, hash } from 'bcrypt';
 
 type UserRequestData = {
   name: string,
@@ -9,6 +10,11 @@ type UserRequestData = {
   password: string
 };
 
+/**
+ * Validate user request data and return a cleaned version
+ * @param req
+ * @returns UserRequestData
+ */
 const validateUserData = (req: Request): UserRequestData => {
   const userData = Joi.object({
     name: Joi.string().min(3).max(30).required(),
@@ -41,17 +47,27 @@ export const registerNewUser = async (req: Request, res: Response) => {
     });
   }
 
+  const salt = await genSalt();
+
   const user = new User();
   user.name = userData.name;
   user.email = userData.email;
-  user.password = userData.password;
+  user.password = await hash(userData.password, salt);
 
   try {
     await AppDataSource.manager.save(user);
-  } catch (error) {
-    return res.status(400).json({
-      message: 'User already exists'
-    });
+  } catch (error: any) {
+    console.log(error);
+
+    if (error.message.includes('Duplicate entry')) {
+      return res.status(400).json({
+        message: 'User already exists'
+      });
+    } else {
+      return res.status(400).json({
+        message: 'Error creating user'
+      });
+    }
   }
 
   return res.json({

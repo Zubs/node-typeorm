@@ -1,8 +1,10 @@
 # Simple Task Manager
 
 ## Features
+- [ ] `User` authentication
 
 ## Todo
+- [ ] Add `Task` logging
 - [ ] Add `Task` entity
 - [ ] Add `Task` controller
 - [ ] Add `Task` service
@@ -17,7 +19,6 @@
 - [ ] Add `Task` sorting
 - [ ] Add `Task` filtering
 - [ ] Add `Task` search
-- [ ] Add `Task` logging
 - [ ] Add `Task` caching
 - [ ] Add `Task` monitoring
 - [ ] Add `Task` CI/CD

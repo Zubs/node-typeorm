@@ -20,7 +20,6 @@ export class User {
 
   @Column({
     type: 'varchar',
-    length: 30,
   })
   password: string | undefined;
 }
